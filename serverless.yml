@@ -1,0 +1,24 @@
+service: kinesis-lambda-test
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "kinesis:GetRecords"
+        - "kinesis:GetShardIterator"
+        - "kinesis:DescribeStream"
+        - "kinesis:ListStreams"
+      Resource: ${opt:stream-arn}
+
+functions:
+  simple:
+    handler: src/simple.handler
+    memorySize: 64
+    events:
+      - stream:
+          arn: ${opt:stream-arn}
+          startingPosition: TRIM_HORIZON
+          batchSize: 10
+          enabled: true
